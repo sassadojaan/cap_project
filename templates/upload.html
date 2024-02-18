@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Lisa uus müts</title>
+    <title>Lisa uus ese</title>
     <!-- Add this line to include Bootstrap from a CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -11,9 +11,10 @@
 
 <body>
     <div class="container mt-3">
-        <h1>Lisa uus müts</h1>
+        <h1>Lisa uus ese</h1>
         <form method="post" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
+            {{ form.collection_id.label }} {{ form.collection_id() }}<br>
             {{ form.name.label }} {{ form.name() }}<br>
             {{ form.team.label }} {{ form.team() }}<br>
             {{ form.description.label }} {{ form.description() }}<br>
