@@ -1,0 +1,33 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kollektsioonideavaleht</title>
+    <!-- Add any additional styling or libraries here -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <h1>Avaleht</h1>
+    {% if 'name' in session %}
+        <p>Tere {{ session['name'] }}!</p>
+    {% endif %}
+    {% if 'message' in session %}
+        <p>{{ session.pop('message') }}</p>
+    {% endif %}
+    <ul>
+        {% if 'name' in session %}
+            <li><a href="{{ url_for('collection') }}">Minu kollektsioonid</a></li>
+            <li><a href="{{ url_for('upload') }}">Lisa uus ese</a></li>
+        {% endif %} 
+        {% if 'name' in session %}
+            <li><a href="{{ url_for('logout') }}">Logi välja</a></li>
+        {% else %} 
+            <li><a href="{{ url_for('register') }}">Registreeri konto</a></li>
+            <li><a href="{{ url_for('login') }}">Logi sisse</a></li>
+        {% endif %} 
+        <li><a href="{{ url_for('search') }}">Otsi kollektsiooni</a></li>
+    </ul>
+</body>
+</html>
