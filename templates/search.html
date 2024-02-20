@@ -4,13 +4,12 @@
 <head>
     <title>Otsi</title>
     <!-- Add this line to include Bootstrap from a CDN -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    {% include 'style.html' %}
 
 </head>
 
 <body>
-    <div class="container mt-3">
+    <div class="container mt-4">
         <h1>Otsi</h1>
         <form method="post" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
@@ -18,6 +17,11 @@
             {{ form.search_text.label }} {{ form.search_text() }}<br>
             {{ form.submit() }}
         </form>
+        {% if all_collectibles %}
+        <h2>Otsingu tulemus</h2>
+        {% include 'table.html' %}
+        {% include 'footer.html' %}
+        {% endif %}
     </div>
 </body>
 

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from flask_migrate import Migrate
 from datetime import date
 from flask_wtf import FlaskForm
@@ -82,7 +83,7 @@ class SubmitCollectible(FlaskForm):
     place_aquired = StringField('Hankimise koht')
     cost = FloatField('Hind')
     date_aquired = DateField('Hankimise kuupäev')
-    picture = FileField('Pilt', validators=[FileRequired(), FileAllowed(['jpg', 'png'], 'Images only!')])
+    picture = FileField('Pilt', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField('Salvesta')
 
 class SubmitSearch(FlaskForm):
@@ -140,7 +141,20 @@ def search():
     form = SubmitSearch()
     users = Users.query.all()
     form.user_id.choices = [(user.id, user.name) for user in users]
-    return render_template('search.html', form=form)
+    all_collectibles = None
+    if request.method == 'POST' and form.validate_on_submit():
+        search_text = form.search_text.data
+        user_id = form.user_id.data
+        all_collectibles = Collectible.query.join(Collection).filter(
+            Collection.user_id == user_id,
+            or_(
+                Collectible.name.ilike(f"%{search_text}%"),  # Search within name
+                Collectible.team.ilike(f"%{search_text}%"),  # Search within team
+                Collectible.description.ilike(f"%{search_text}%")  # Search within description
+            )
+        ).all()
+    return render_template('search.html', form=form, all_collectibles=all_collectibles)
+#TODO otsingufunktsionaalsus
 
 @app.route('/collection', methods=['GET', 'POST'])
 def collection():

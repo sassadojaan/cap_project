@@ -14,15 +14,19 @@
         <h1>Lisa uus ese</h1>
         <form method="post" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
-            {{ form.collection_id.label }} {{ form.collection_id() }}<br>
-            {{ form.name.label }} {{ form.name() }}<br>
-            {{ form.team.label }} {{ form.team() }}<br>
-            {{ form.description.label }} {{ form.description() }}<br>
-            {{ form.place_aquired.label }} {{ form.place_aquired() }}<br>
-            {{ form.cost.label }} {{ form.cost() }}<br>
-            {{ form.date_aquired.label }} {{ form.date_aquired() }}<br>
-            {{ form.picture.label }} {{ form.picture() }}<br>
-            {{ form.submit() }}
+            {% if not form.collection_id.choices %}
+            <a href="{{ url_for('collection') }}">Kõigepealt lisa kollektsioon!</a>
+            {% else %}
+                {{ form.collection_id.label }} {{ form.collection_id() }}<br>
+                {{ form.name.label }} {{ form.name() }}<br>
+                {{ form.team.label }} {{ form.team() }}<br>
+                {{ form.description.label }} {{ form.description() }}<br>
+                {{ form.place_aquired.label }} {{ form.place_aquired() }}<br>
+                {{ form.cost.label }} {{ form.cost() }}<br>
+                {{ form.date_aquired.label }} {{ form.date_aquired() }}<br>
+                {{ form.picture.label }} {{ form.picture() }}<br>
+                {{ form.submit() }}
+            {% endif %}
         </form>
     </div>
 </body>
