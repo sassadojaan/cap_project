@@ -20,28 +20,28 @@ app.config['UPLOAD_FOLDER'] = '/home/sass/projekt/static/pics'
 db = SQLAlchemy(app)
 
 migrate = Migrate(app,db)
-
-class Users(db.Model):
+#kasutaja mudel
+class Users(db.Model):                                
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     username = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(20), nullable=False)
     collections = db.relationship('Collection', backref='user', lazy=True) 
-    
+#kasutaja registreerimise vorm    
 class UserReg(FlaskForm):
-    name = StringField('Nimi', validators=[validators.DataRequired(), validators.Regexp('^[A-Za-z0-9_ ]+$')])
+    name = StringField('Nimi', validators=[validators.DataRequired(), validators.Regexp('^[A-Za-z0-9_ ]+$')])         
     username = StringField('Kasutajatunnus', validators=[validators.DataRequired(), validators.Length(min=6, max=20)])
     email = StringField('E-posti aadress', validators=[validators.DataRequired(), validators.Email()])
     password = PasswordField('Parool', validators=[validators.DataRequired(), validators.Length(min=8, max=20)])
     confirmpassword = PasswordField('Korda parooli', validators=[validators.EqualTo('password')])
     submit = SubmitField('Registreeri')
-    
-class UserLogin(FlaskForm):
+#kasutaja login vorm    
+class UserLogin(FlaskForm):                                 
     username = StringField('Kasutajatunnus', validators=[validators.DataRequired(), validators.Length(min=6, max=20)])
     password = PasswordField('Parool', validators=[validators.DataRequired(), validators.Length(min=8, max=20)])
     submit = SubmitField('Login')
-
+#kasutaja autentimine
 def authenticate_user(username, password):
     user = Users.query.filter_by(username=username).first()
     if user and check_password_hash(user.password, password):
@@ -53,17 +53,17 @@ def authenticate_user(username, password):
     else:
         session['message'] = 'Ebaõnnestunud login'
         return False
-
+#kollektsiooni mudel
 class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
     collectibles = db.relationship('Collectible', backref='collection', lazy=True)
-
+#Uue kollektsiooni sisestamis vorm
 class SubmitCollection(FlaskForm):
     name = StringField('Kollektsiooni nimi', validators=[validators.DataRequired()])
     submit = SubmitField('Salvesta')
-        
+#kollektsiooni eseme mudel        
 class Collectible(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
@@ -74,7 +74,7 @@ class Collectible(db.Model):
     date_aquired = db.Column(db.Date, nullable=True)
     picture = db.Column(db.String)
     collection_id = db.Column(db.Integer, db.ForeignKey('collection.id'), nullable=False)
-    
+#kollektsiooni eseme sisestamis vorm    
 class SubmitCollectible(FlaskForm):
     collection_id = SelectField('Kollektsioon', coerce=int)
     name = StringField('Nimi', validators=[validators.DataRequired()])
@@ -83,22 +83,18 @@ class SubmitCollectible(FlaskForm):
     place_aquired = StringField('Hankimise koht')
     cost = FloatField('Hind')
     date_aquired = DateField('Hankimise kuupäev')
-    picture = FileField('Pilt', validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
+    picture = FileField('Pilt', validators=[validators.DataRequired(), FileAllowed(['jpg', 'png'], 'Images only!')])
     submit = SubmitField('Salvesta')
-
+#otsingu vorm
 class SubmitSearch(FlaskForm):
     user_id = SelectField('Kasutajatunnus', coerce=int)
     search_text = StringField('Otsing')
     submit = SubmitField('Otsi')
-        
-@app.route('/home')
-def home():
-    return render_template('home.html')
-
+#avaleht
 @app.route('/')
 def front():
     return render_template('front.html')
-
+#registreerimis leht
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = UserReg()
@@ -115,7 +111,7 @@ def register():
         
         return redirect(url_for('front'))
     return render_template('register.html', form=form)
-
+#login leht
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = UserLogin()
@@ -130,12 +126,12 @@ def login():
         else:
             return render_template('login.html', form=form) 
     return render_template('login.html', form=form)
-
+#välja logimis leht
 @app.route('/logout')
 def logout():
     session.clear()  
     return redirect(url_for('front'))
-
+#otsingu leht
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SubmitSearch()
@@ -154,8 +150,7 @@ def search():
             )
         ).all()
     return render_template('search.html', form=form, all_collectibles=all_collectibles)
-#TODO otsingufunktsionaalsus
-
+#kollektsiooni leht
 @app.route('/collection', methods=['GET', 'POST'])
 def collection():
     form = SubmitCollection()
@@ -169,7 +164,7 @@ def collection():
         session['message'] = 'Lisati kollektsioon ' + name
         return redirect(url_for('front'))
     return render_template('collection.html', form=form, user=user)    
-
+#eseme lisamise leht
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     form = SubmitCollectible()
@@ -194,9 +189,9 @@ def upload():
         db.session.add(new_entry)
         db.session.commit()
 
-        return redirect(url_for('front'))  # Redirect after successful upload , will add "Successfully uploaded!" html page
+        return redirect(url_for('front')) 
     return render_template('upload.html', form=form)
-
+#kollektsiooni vaatamis leht
 @app.route('/all/<int:collection_id>')
 def all(collection_id):
     all_collectibles = Collectible.query.filter(Collectible.collection_id == collection_id).all()
